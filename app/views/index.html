@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vehicle Detection Website</title>
+    <style>
+        canvas {
+            display: block;
+            border: 1px solid black;
+            margin-top: 10px;
+        }
+        label, input, button {
+            display: block;
+            margin-top: 10px;
+        }
+        .saved-images img {
+            max-width: 300px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <label for="descriptionInput">Image Description:</label>
+    <input id="descriptionInput" type="text" placeholder="Enter a description">
+    
+    <label for="uploadInput">Upload Image:</label>
+    <input id="uploadInput" type="file">
+    
+    <button id="uploadButton">Upload and Detect</button>
+
+    <a href="/subscribe-form"><button id="subscribeButton">Subscribe to Notifications</button></a>
+    <a href="/unsubscribe-form"><button id="unsubscribeButton">Unsubscribe to Notifications</button></a>
+    
+    <canvas></canvas>
+    <div class="saved-images"></div>
+
+    <script>
+        const input = document.getElementById("uploadInput");
+        const descriptionInput = document.getElementById("descriptionInput");
+        const uploadButton = document.getElementById("uploadButton");
+        const fetchImagesButton = document.getElementById("fetchImagesButton");
+        const savedImagesContainer = document.querySelector(".saved-images");
+
+        /**
+         * "Upload" button onClick handler: uploads the selected image file
+         * and description to the backend, receives an array of detected objects,
+         * and draws them on top of the image.
+         */
+        uploadButton.addEventListener("click", async () => {
+            if (input.files.length === 0) {
+                alert("Please select an image to upload.");
+                return;
+            }
+            
+            const data = new FormData();
+            data.append("image_file", input.files[0], "image_file");
+            data.append("description", descriptionInput.value || "");
+
+            const response = await fetch("/detect", {
+                method: "POST",
+                body: data
+            });
+            const boxes = await response.json();
+            draw_image_and_boxes(input.files[0], boxes);
+        });
+
+        /**
+         * "Fetch Images" button onClick handler: retrieves all saved images
+         * and their bounding boxes from the backend, and displays them.
+         */
+        fetchImagesButton.addEventListener("click", async () => {
+            const response = await fetch("/images");
+            const images = await response.json();
+            displaySavedImages(images);
+        });
+
+        /**
+         * Function draws the image from the provided file
+         * and bounding boxes of detected objects on top of the image.
+         * @param file Uploaded file object
+         * @param boxes Array of bounding boxes in format [[x1, y1, x2, y2, object_type, probability], ...]
+         */
+        function draw_image_and_boxes(file, boxes) {
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.querySelector("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+                ctx.strokeStyle = "#00FF00";
+                ctx.lineWidth = 3;
+                ctx.font = "18px serif";
+
+                boxes.forEach(([x1, y1, x2, y2, label]) => {
+                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                    ctx.fillStyle = "#00FF00";
+                    const width = ctx.measureText(label).width;
+                    ctx.fillRect(x1, y1, width + 10, 25);
+                    ctx.fillStyle = "#000000";
+                    ctx.fillText(label, x1, y1 + 18);
+                });
+            };
+        }
+
+        /**
+         * Function displays saved images with their descriptions in the saved images container.
+         * @param images Array of saved image objects { image: base64 string, boxes: [...] }
+         */
+         function displaySavedImages(images) {
+            savedImagesContainer.innerHTML = "";
+            images.forEach(image => {
+                const imgElement = document.createElement("img");
+                imgElement.src = image.imageUrl; // The image URL from the server
+                savedImagesContainer.appendChild(imgElement);
+            });
+            }
+    </script>
+</body>
+</html>
