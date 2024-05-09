@@ -20,6 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: /home/runner/work/vehicle-detection/vehicle-detection/app
 
       - name: Run static code analysis
         run: npm run lint  
