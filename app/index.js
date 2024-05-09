@@ -14,6 +14,21 @@ async function main() {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
 
+    app.get('/health', (req, res) => {
+        // Simple health check logic
+        const healthCheck = {
+            uptime: process.uptime(),
+            message: 'OK',
+            timestamp: Date.now()
+        };
+        try {
+            res.status(200).json(healthCheck);
+        } catch (e) {
+            healthCheck.message = e;
+            res.status(503).json(healthCheck);
+        }
+    });
+
     // Load routes
     const mainRoutes = require('./routes/mainRoutes');
     app.use('/', mainRoutes);
