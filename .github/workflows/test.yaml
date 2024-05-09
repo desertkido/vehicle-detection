@@ -24,3 +24,4 @@ jobs:
 
       - name: Run static code analysis
         run: npm run lint  
+        working-directory: /home/runner/work/vehicle-detection/vehicle-detection/app
