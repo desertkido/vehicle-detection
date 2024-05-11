@@ -34,3 +34,24 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 3
+        env:
+        - name: EMAIL
+          valueFrom:
+            secretKeyRef:
+              name: nodejs-app-secrets
+              key: EMAIL
+        - name: EMAIL_PASS
+          valueFrom:
+            secretKeyRef:
+              name: nodejs-app-secrets
+              key: EMAIL_PASS
+        - name: RABBITMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: nodejs-app-secrets
+              key: RABBITMQ_USER
+        - name: RABBITMQ_PW
+          valueFrom:
+            secretKeyRef:
+              name: nodejs-app-secrets
+              key: RABBITMQ_PW                

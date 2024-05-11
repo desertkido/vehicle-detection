@@ -1,16 +1,19 @@
 const nodemailer = require('nodemailer');
 
+const email = process.env.EMAIL;
+const emailPass = process.env.EMAIL_PASS;
+
 let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'vaczi.otti@gmail.com',
-        pass: 'ourf fywp ntqa ancx'
+        user: email,
+        pass: emailPass
     }
 });
 
 sendEmail = async (to, subject, text) => {
     let mailOptions = {
-        from: 'vaczi.otti@gmail.com',
+        from: email,
         to: to,
         subject: subject,
         text: text
