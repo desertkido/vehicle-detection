@@ -68,9 +68,9 @@ jobs:
           git commit -m "Update values.yaml [skip ci]"
           git push
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Create Automatic Release
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          files: source_code.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}    
+          repo_token: "${{ secrets.REPO_ACCESS_TOKEN }}"
+          automatic_release_tag: "latest"
+          files: "release.zip"   
