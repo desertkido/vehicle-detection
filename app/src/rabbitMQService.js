@@ -9,7 +9,7 @@ exports.connectRabbitMQ = async () => {
     const username = process.env.RABBITMQ_USER;
     const password = process.env.RABBITMQ_PW;
     try {
-        const connection = await amqp.connect(`amqp://${username}:${password}t@rabbitmq:5672`);
+        const connection = await amqp.connect(`amqp://${username}:${password}@rabbitmq:5672`);
         const channel = await connection.createChannel();
         await channel.assertQueue('notificationQueue', {
             durable: true
